@@ -93,9 +93,9 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
         a_report_file (str): Filename of where to store reports for
         a_prev_bal (float): Previous balance
         a_summary_file (str): Filename where summaries of previous runs
-        are stored
+            are stored
         a_summary_plot (str): Filename where trendline summaries are to be
-        plotted
+            plotted
     Returns:
         None
     """
@@ -108,16 +108,18 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
     sav_pct = 100.0 * savings / tot_inc
     net_worth = a_prev_bal + savings
     # compute grouped expenses and income
-    grp_exp = categorize_tx(exp, "Expenses", "PiePlot_Expenses.png")
-    grp_inc = categorize_tx(inc, "Income", "PiePlot_Income.png")
+    grp_exp = categorize_tx(exp, "Expenses", "PiePlot_Expenses_" +
+        a_period + ".png")
+    grp_inc = categorize_tx(inc, "Income", "PiePlot_Income_" +
+        a_period + ".png")
     with open(a_report_file,'w') as rf:
         rf.write("Budget Report for {}\n".format(a_period))
         rf.write("Starting balance = $ {:.2f}\n".format(a_prev_bal))
         rf.write("Total income = $ {:.2f}\n".format(tot_inc))
         rf.write("Total expenses = $ {:.2f}\n".format(tot_exp))
         rf.write("Net savings = $ {:.2f}\n".format(savings))
-        rf.write("Savings as a % of income = {:.2f}%\n".format(sav_pct))
         rf.write("Net worth = $ {:.2f}\n".format(net_worth))
+        rf.write("Savings as a % of income = {:.2f}%\n".format(sav_pct))
         rf.write("\nCategory-wise income [$]:\n")
         rf.write(grp_inc.to_string())
         rf.write("\n\nCategory-wise expenses [$]:\n")
@@ -131,7 +133,7 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
     # endif #
     with open(a_summary_file,'a') as sf:
         sf.write("{},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}\n".format(a_period,
-            tot_inc, tot_exp, savings, sav_pct, net_worth))
+            tot_inc, tot_exp, savings, net_worth, sav_pct))
     # endwith #
     summary_df = pd.read_csv(a_summary_file)
     plt.close('all')
