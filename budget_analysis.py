@@ -99,6 +99,7 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
     Returns:
         None
     """
+    assert type(a_prev_bal) is float, "Previous balance must be numeric."
     exp, inc = read_tx_file(a_tx_file)
     # compute total expenses, income
     tot_exp = np.sum(exp['Amount'])
