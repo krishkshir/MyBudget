@@ -150,7 +150,6 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
 
 if __name__ == "__main__":
     passed_args = sys.argv[1:]
-    print(passed_args)
     if len(passed_args) > 3:
         # convert string to float
         passed_args[3] = float(passed_args[3])
