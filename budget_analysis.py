@@ -95,6 +95,8 @@ def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
         a_exp (Dataframe): Dataframe containing only expense information
         a_summary_file (str): Filename where summaries of previous runs
             are stored
+    Returns:
+        None
     """
     tot_inc = np.sum(a_inc['Amount'])
     tot_exp = np.sum(a_exp['Amount'])
@@ -134,6 +136,35 @@ def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
     # endwith #
 # enddef write_reports() #
 
+def plot_overall_summary(a_summary_file, a_summary_plot):
+    """
+    Function to plot overall summary as lineplot.
+    Parameters:
+        a_summary_file (str): Filename where summaries of previous runs
+            are stored
+        a_summary_plot (str): Filename where trendline summaries are to be
+            plotted
+    Returns:
+        None
+    """
+    summary_df = pd.read_csv(a_summary_file)
+    plt.close('all')
+    fig, ax1 = plt.subplots()
+    ax1.plot(summary_df.iloc[:,0],summary_df.iloc[:,1:5])
+    ax1.set_ylabel('$')
+    ax1.legend(['Income', 'Expenses', 'Savings', 'Net worth'], loc='upper left')
+    ax2 = ax1.twinx()
+    ax2.plot(summary_df.iloc[:,0], summary_df.iloc[:,5],'k--')
+    ax2.set_ylabel('%')
+    ax2.legend(['%-savings'], loc='upper right')
+    ax1.grid(b=True, which='both', axis='both', color='r', linestyle='-',
+            linewidth=0.2)
+    ax2.grid(b=True, which='both', axis='both', color='b', linestyle='--',
+            linewidth=0.3)
+    plt.tight_layout()
+    plt.savefig(a_summary_plot)
+# enddef plot_overall_summary() #
+
 def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
         a_summary_file="MyBudget2019.csv", a_summary_plot="TallyTrend.png"):
     """ Main function.
@@ -154,22 +185,8 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
     # compute total expenses, income, savings, %-savings, net worth and write
     # summary reports
     write_reports(a_report_file, a_period, a_prev_bal, inc, exp, a_summary_file)
-    summary_df = pd.read_csv(a_summary_file)
-    plt.close('all')
-    fig, ax1 = plt.subplots()
-    ax1.plot(summary_df.iloc[:,0],summary_df.iloc[:,1:5])
-    ax1.set_ylabel('$')
-    ax1.legend(['Income', 'Expenses', 'Savings', 'Net worth'], loc='upper left')
-    ax2 = ax1.twinx()
-    ax2.plot(summary_df.iloc[:,0], summary_df.iloc[:,5],'k--')
-    ax2.set_ylabel('%')
-    ax2.legend(['%-savings'], loc='upper right')
-    ax1.grid(b=True, which='both', axis='both', color='r', linestyle='-',
-            linewidth=0.2)
-    ax2.grid(b=True, which='both', axis='both', color='b', linestyle='--',
-            linewidth=0.3)
-    plt.tight_layout()
-    plt.savefig(a_summary_plot)
+    # plot overall summary
+    plot_overall_summary(a_summary_file, a_summary_plot)
 # enddef main() #
 
 if __name__ == "__main__":
