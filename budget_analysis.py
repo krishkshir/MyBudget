@@ -7,6 +7,7 @@ License: GPLv3+
 
 import os
 import sys
+import warnings
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -73,28 +74,6 @@ def categorize_tx(a_tx, a_cols=['Category', 'Amount']):
     return grouped_tx
 # enddef tally_tx() #
 
-def plot_tallied_tx(a_grouped_tx,a_title, a_plotfile,  a_col='Contribution [%]'):
-    """
-    Function to plot tallied transactions
-    Paramaters:
-        a_grouped_tx(DataFrame): Total of transactions per category
-        a_plotfile (str): Filename to save pie plot in
-        a_title (str): Title of pie plot
-        a_col (str): Column name containing contribution of each category
-    Returns:
-        None
-    """
-    plt.close('all')
-    plt.bar(np.arange(a_grouped_tx.shape[0]), a_grouped_tx[a_col],
-            tick_label=a_grouped_tx.index.values)
-    plt.title(a_title)
-    plt.grid(b=True, which='both', axis='both')
-    plt.xticks(rotation=90)
-    plt.ylabel('%')
-    plt.tight_layout()
-    plt.savefig(a_plotfile)
-# enddef plot_tallied_tx() #
-
 def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
         a_summary_file):
     """ Function to create summary reports.
@@ -116,6 +95,12 @@ def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
     savings = tot_inc - tot_exp
     # NOTE: We implicitly assume total income > 0, otherwise the computation of
     # percentage savings below gives a meaningless result!
+    if tot_inc < 0:
+        warning_msg = "Total income for {:s} is negative (-${:.2f}),"
+        warning_msg +=" so percent-savings rate computation is meaningless!"
+        warning_msg = warning_msg.format(a_period, -tot_inc)
+        warnings.warn(warning_msg)
+    # endif #
     sav_pct = 100.0 * savings / tot_inc
     net_worth = a_prev_bal + savings
     # compute and plot grouped expenses and income
@@ -129,6 +114,10 @@ def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
         rf.write("Net savings = $ {:.2f}\n".format(savings))
         rf.write("Net worth = $ {:.2f}\n".format(net_worth))
         rf.write("Savings as a % of income = {:.2f}%\n".format(sav_pct))
+        if tot_inc < 0:
+            rf.write("Since total income is negative, %-savings above invalid!")
+            rf.write("\n")
+        # endif #
         rf.write("\nCategory-wise income [$]:\n")
         rf.write(grp_inc.to_string())
         rf.write("\n\nCategory-wise expenses [$]:\n")
@@ -146,6 +135,29 @@ def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
     # endwith #
     return grp_inc, grp_exp
 # enddef write_reports() #
+
+def plot_tallied_tx(a_grouped_tx, a_title, a_plotfile,
+        a_col='Contribution [%]'):
+    """
+    Function to plot tallied transactions
+    Paramaters:
+        a_grouped_tx(DataFrame): Total of transactions per category
+        a_plotfile (str): Filename to save pie plot in
+        a_title (str): Title of pie plot
+        a_col (str): Column name containing contribution of each category
+    Returns:
+        None
+    """
+    plt.close('all')
+    plt.bar(np.arange(a_grouped_tx.shape[0]), a_grouped_tx[a_col],
+            tick_label=a_grouped_tx.index.values)
+    plt.title(a_title)
+    plt.grid(b=True, which='both', axis='both')
+    plt.xticks(rotation=90)
+    plt.ylabel('%')
+    plt.tight_layout()
+    plt.savefig(a_plotfile)
+# enddef plot_tallied_tx() #
 
 def plot_overall_summary(a_summary_file, a_summary_plot):
     """
@@ -191,7 +203,8 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
     Returns:
         None
     """
-    assert isinstance(a_prev_bal, (float, int)), "Previous balance must be numeric."
+    assert isinstance(a_prev_bal, (float, int)),\
+        "Previous balance must be numeric."
     exp, inc = read_tx_file(a_tx_file)
     # compute total expenses, income, savings, %-savings, net worth and write
     # summary reports
