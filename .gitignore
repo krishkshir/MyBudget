@@ -105,3 +105,6 @@ venv.bak/
 
 # temporary directory
 tmp/
+
+# OS-files
+.DS_Store
