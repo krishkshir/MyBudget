@@ -47,11 +47,11 @@ def read_tx_file(a_tx_file, a_skiprows=3, a_skipfooter=0, a_ord=True,
         expenses.columns = a_cols
     # endif #
     # drop extraneous rows, if required
-    expenses.dropna(inplace=True)
+    expenses = expenses.dropna()
     # replace currency format into float
     expenses[a_cols[1]] = pd.to_numeric(
             expenses[a_cols[1]].replace(a_currency_symbols, '',regex=True))
-    income.dropna(inplace=True)
+    income = income.dropna()
     income[a_cols[1]] = pd.to_numeric(
             income[a_cols[1]].replace(a_currency_symbols, '',regex=True))
     return expenses, income
