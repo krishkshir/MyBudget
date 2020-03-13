@@ -84,26 +84,20 @@ def categorize_tx(a_tx, a_title, a_plotfile,
     return grouped_tx
 # enddef tally_tx() #
 
-def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
-        a_summary_file="MyBudget2019.csv", a_summary_plot="TallyTrend.png"):
-    """ Main function.
+def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
+        a_summary_file):
+    """ Function to create summary reports.
     Parameters:
-        a_tx_file (str): Name of transactions CSV file
-        a_period (str): Time period for which transactions are processed
         a_report_file (str): Filename of where to store reports for
+        a_period (str): Time period for which transactions are processed
         a_prev_bal (float): Previous balance
+        a_inc (Dataframe): Dataframe containing only income information
+        a_exp (Dataframe): Dataframe containing only expense information
         a_summary_file (str): Filename where summaries of previous runs
             are stored
-        a_summary_plot (str): Filename where trendline summaries are to be
-            plotted
-    Returns:
-        None
     """
-    assert isinstance(a_prev_bal, (float, int)), "Previous balance must be numeric."
-    exp, inc = read_tx_file(a_tx_file)
-    # compute total expenses, income
-    tot_exp = np.sum(exp['Amount'])
-    tot_inc = np.sum(inc['Amount'])
+    tot_inc = np.sum(a_inc['Amount'])
+    tot_exp = np.sum(a_exp['Amount'])
     # compute savings, savings-% and net worth
     savings = tot_inc - tot_exp
     # NOTE: We implicitly assume total income > 0, otherwise the computation of
@@ -111,9 +105,9 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
     sav_pct = 100.0 * savings / tot_inc
     net_worth = a_prev_bal + savings
     # compute grouped expenses and income
-    grp_exp = categorize_tx(exp, "Expenses", "PiePlot_Expenses_" +
+    grp_exp = categorize_tx(a_exp, "Expenses", "PiePlot_Expenses_" +
         a_period + ".png")
-    grp_inc = categorize_tx(inc, "Income", "PiePlot_Income_" +
+    grp_inc = categorize_tx(a_inc, "Income", "PiePlot_Income_" +
         a_period + ".png")
     with open(a_report_file,'w') as rf:
         rf.write("Budget Report for {}\n".format(a_period))
@@ -138,6 +132,28 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
         sf.write("{},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}\n".format(a_period,
             tot_inc, tot_exp, savings, net_worth, sav_pct))
     # endwith #
+# enddef write_reports() #
+
+def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
+        a_summary_file="MyBudget2019.csv", a_summary_plot="TallyTrend.png"):
+    """ Main function.
+    Parameters:
+        a_tx_file (str): Name of transactions CSV file
+        a_period (str): Time period for which transactions are processed
+        a_report_file (str): Filename of where to store reports for
+        a_prev_bal (float): Previous balance
+        a_summary_file (str): Filename where summaries of previous runs
+            are stored
+        a_summary_plot (str): Filename where trendline summaries are to be
+            plotted
+    Returns:
+        None
+    """
+    assert isinstance(a_prev_bal, (float, int)), "Previous balance must be numeric."
+    exp, inc = read_tx_file(a_tx_file)
+    # compute total expenses, income, savings, %-savings, net worth and write
+    # summary reports
+    write_reports(a_report_file, a_period, a_prev_bal, inc, exp, a_summary_file)
     summary_df = pd.read_csv(a_summary_file)
     plt.close('all')
     fig, ax1 = plt.subplots()
