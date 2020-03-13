@@ -72,8 +72,8 @@ def categorize_tx(a_tx, a_title, a_plotfile,
     """
     # group transactions and add them
     grouped_tx =  a_tx.groupby(a_cols[0]).aggregate(np.sum)
-    grouped_tx['Contribution [%]'] = 100 * grouped_tx[a_cols[1]]/np.sum(
-            a_tx[a_cols[1]])
+    grouped_tx['Contribution [%]'] = 100 * grouped_tx[a_cols[1]]/np.abs(np.sum(
+            a_tx[a_cols[1]]))
     # create pie plot
     plt.close('all')
     plt.pie(grouped_tx[a_cols[1]],
