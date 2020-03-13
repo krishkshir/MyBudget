@@ -57,16 +57,12 @@ def read_tx_file(a_tx_file, a_skiprows=3, a_skipfooter=0, a_ord=True,
     return expenses, income
 # enddef read_tx_file() #
 
-def categorize_tx(a_tx, a_title, a_plotfile,
-        a_cols=['Category', 'Amount']):
-    """ Function to categorize transactions in income or expenses and
-    produce a pie chart showing the breakdown
+def categorize_tx(a_tx, a_cols=['Category', 'Amount']):
+    """ Function to categorize transactions in income or expenses
     Parameters:
         a_tx (DataFrame): Dataframe containing transactions
-        a_title (str): Title of pie plot
-        a_plotfile (str): Filename to save pie plot in
         a_cols (list of strings): Column names containing relevant
-        transaction information in the order (Category, Amount)
+            transaction information in the order (Category, Amount)
     Returns:
         grouped_tx (DataFrame): Total of transactions per category
     """
@@ -74,15 +70,30 @@ def categorize_tx(a_tx, a_title, a_plotfile,
     grouped_tx =  a_tx.groupby(a_cols[0]).aggregate(np.sum)
     grouped_tx['Contribution [%]'] = 100 * grouped_tx[a_cols[1]]/np.abs(np.sum(
             a_tx[a_cols[1]]))
-    # create pie plot
-    plt.close('all')
-    plt.pie(grouped_tx[a_cols[1]],
-            labels=grouped_tx.index.values, autopct='%.2f%%')
-    plt.axis('equal')
-    plt.title(a_title)
-    plt.savefig(a_plotfile)
     return grouped_tx
 # enddef tally_tx() #
+
+def plot_tallied_tx(a_grouped_tx,a_title, a_plotfile,  a_col='Contribution [%]'):
+    """
+    Function to plot tallied transactions
+    Paramaters:
+        a_grouped_tx(DataFrame): Total of transactions per category
+        a_plotfile (str): Filename to save pie plot in
+        a_title (str): Title of pie plot
+        a_col (str): Column name containing contribution of each category
+    Returns:
+        None
+    """
+    plt.close('all')
+    plt.bar(np.arange(a_grouped_tx.shape[0]), a_grouped_tx[a_col],
+            tick_label=a_grouped_tx.index.values)
+    plt.title(a_title)
+    plt.grid(b=True, which='both', axis='both')
+    plt.xticks(rotation=90)
+    plt.ylabel('%')
+    plt.tight_layout()
+    plt.savefig(a_plotfile)
+# enddef plot_tallied_tx() #
 
 def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
         a_summary_file):
@@ -98,6 +109,7 @@ def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
     Returns:
         None
     """
+    # compute total income and expenses
     tot_inc = np.sum(a_inc['Amount'])
     tot_exp = np.sum(a_exp['Amount'])
     # compute savings, savings-% and net worth
@@ -106,11 +118,9 @@ def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
     # percentage savings below gives a meaningless result!
     sav_pct = 100.0 * savings / tot_inc
     net_worth = a_prev_bal + savings
-    # compute grouped expenses and income
-    grp_exp = categorize_tx(a_exp, "Expenses", "PiePlot_Expenses_" +
-        a_period + ".png")
-    grp_inc = categorize_tx(a_inc, "Income", "PiePlot_Income_" +
-        a_period + ".png")
+    # compute and plot grouped expenses and income
+    grp_inc = categorize_tx(a_inc)
+    grp_exp = categorize_tx(a_exp)
     with open(a_report_file,'w') as rf:
         rf.write("Budget Report for {}\n".format(a_period))
         rf.write("Starting balance = $ {:.2f}\n".format(a_prev_bal))
@@ -134,6 +144,7 @@ def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
         sf.write("{},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}\n".format(a_period,
             tot_inc, tot_exp, savings, net_worth, sav_pct))
     # endwith #
+    return grp_inc, grp_exp
 # enddef write_reports() #
 
 def plot_overall_summary(a_summary_file, a_summary_plot):
@@ -184,8 +195,11 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
     exp, inc = read_tx_file(a_tx_file)
     # compute total expenses, income, savings, %-savings, net worth and write
     # summary reports
-    write_reports(a_report_file, a_period, a_prev_bal, inc, exp, a_summary_file)
-    # plot overall summary
+    grp_inc, grp_exp = write_reports(a_report_file, a_period, a_prev_bal, inc,
+            exp, a_summary_file)
+    # plot category breakdown for this period and overall summary
+    plot_tallied_tx(grp_inc, "Income", "Plot_Income_" + a_period + ".png")
+    plot_tallied_tx(grp_exp, "Expenses", "Plot_Expenses_" + a_period + ".png")
     plot_overall_summary(a_summary_file, a_summary_plot)
 # enddef main() #
 
