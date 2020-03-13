@@ -138,13 +138,15 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
     # endwith #
     summary_df = pd.read_csv(a_summary_file)
     plt.close('all')
-    ax = summary_df.plot(x=0,y=np.arange(1,5))
-    ax.set_ylabel('$')
-    ax.legend(['Income', 'Expenses', 'Savings', 'Net worth'], loc='upper left')
-    ax2 = ax.twinx()
+    fig, ax1 = plt.subplots()
+    ax1.plot(summary_df.iloc[:,0],summary_df.iloc[:,1:5])
+    ax1.set_ylabel('$')
+    ax1.legend(['Income', 'Expenses', 'Savings', 'Net worth'], loc='upper left')
+    ax2 = ax1.twinx()
     ax2.plot(summary_df.iloc[:,0], summary_df.iloc[:,5],'k--')
     ax2.set_ylabel('%')
     ax2.legend(['%-savings'], loc='upper right')
+    plt.tight_layout()
     plt.savefig(a_summary_plot)
 # enddef main() #
 
