@@ -146,6 +146,10 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
     ax2.plot(summary_df.iloc[:,0], summary_df.iloc[:,5],'k--')
     ax2.set_ylabel('%')
     ax2.legend(['%-savings'], loc='upper right')
+    ax1.grid(b=True, which='both', axis='both', color='r', linestyle='-',
+            linewidth=0.2)
+    ax2.grid(b=True, which='both', axis='both', color='b', linestyle='--',
+            linewidth=0.3)
     plt.tight_layout()
     plt.savefig(a_summary_plot)
 # enddef main() #
