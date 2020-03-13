@@ -106,6 +106,8 @@ def main(a_tx_file, a_period, a_report_file, a_prev_bal=0.0,
     tot_inc = np.sum(inc['Amount'])
     # compute savings, savings-% and net worth
     savings = tot_inc - tot_exp
+    # NOTE: We implicitly assume total income > 0, otherwise the computation of
+    # percentage savings below gives a meaningless result!
     sav_pct = 100.0 * savings / tot_inc
     net_worth = a_prev_bal + savings
     # compute grouped expenses and income
