@@ -149,12 +149,14 @@ def plot_tallied_tx(a_grouped_tx, a_title, a_plotfile,
         None
     """
     plt.close('all')
-    plt.bar(np.arange(a_grouped_tx.shape[0]), a_grouped_tx[a_col],
+    fig, ax = plt.subplots()
+    ax.bar(np.arange(a_grouped_tx.shape[0]), a_grouped_tx[a_col],
             tick_label=a_grouped_tx.index.values)
-    plt.title(a_title)
-    plt.grid(b=True, which='both', axis='both')
+    ax.set_title(a_title)
+    ax.minorticks_on()
+    ax.grid(b=True, which='both', axis='both')
     plt.xticks(rotation=90)
-    plt.ylabel('%')
+    ax.set_ylabel('%')
     plt.tight_layout()
     plt.savefig(a_plotfile)
 # enddef plot_tallied_tx() #
@@ -180,8 +182,10 @@ def plot_overall_summary(a_summary_file, a_summary_plot):
     ax2.plot(summary_df.iloc[:,0], summary_df.iloc[:,5],'k--')
     ax2.set_ylabel('%')
     ax2.legend(['%-savings'], loc='upper right')
+    ax1.minorticks_on()
     ax1.grid(b=True, which='both', axis='both', color='r', linestyle='-',
             linewidth=0.2)
+    ax2.minorticks_on()
     ax2.grid(b=True, which='both', axis='both', color='b', linestyle='--',
             linewidth=0.3)
     plt.tight_layout()
