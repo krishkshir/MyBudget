@@ -96,12 +96,13 @@ def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
     # NOTE: We implicitly assume total income > 0, otherwise the computation of
     # percentage savings below gives a meaningless result!
     if tot_inc < 0:
-        warning_msg = "Total income for {:s} is negative (-${:.2f}),"
-        warning_msg +=" so percent-savings rate computation is meaningless!"
+        warning_msg = "Total income for {:s} is negative (-${:.2f})!"
         warning_msg = warning_msg.format(a_period, -tot_inc)
         warnings.warn(warning_msg)
+        sav_pct = -np.inf
+    else:
+        sav_pct = 100.0 * savings / tot_inc
     # endif #
-    sav_pct = 100.0 * savings / tot_inc
     net_worth = a_prev_bal + savings
     # compute and plot grouped expenses and income
     grp_inc = categorize_tx(a_inc)
@@ -114,10 +115,6 @@ def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
         rf.write("Net savings = $ {:.2f}\n".format(savings))
         rf.write("Net worth = $ {:.2f}\n".format(net_worth))
         rf.write("Savings as a % of income = {:.2f}%\n".format(sav_pct))
-        if tot_inc < 0:
-            rf.write("Since total income is negative, %-savings above invalid!")
-            rf.write("\n")
-        # endif #
         rf.write("\nCategory-wise income [$]:\n")
         rf.write(grp_inc.to_string())
         rf.write("\n\nCategory-wise expenses [$]:\n")
