@@ -72,7 +72,7 @@ def categorize_tx(a_tx, a_cols=['Category', 'Amount']):
     grouped_tx['Contribution [%]'] = 100 * grouped_tx[a_cols[1]]/np.abs(np.sum(
             a_tx[a_cols[1]]))
     return grouped_tx
-# enddef tally_tx() #
+# enddef categorize_tx() #
 
 def write_reports(a_report_file, a_period, a_prev_bal, a_inc, a_exp,
         a_summary_file):
