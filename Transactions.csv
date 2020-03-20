@@ -1,11 +1,11 @@
 ,Change or add categories by updating the Expenses and Income tables in the Summary sheet.,,,,,,,,
-,Expenses,,,,,Income,,,
-,,,,,,,,,
-,Date,Amount,Description,Category,Running remaining budget,Date,Amount,Description,Category
-,12/8/2000,$100.00,Rent,Utilities,+$50,12/8/2000,"$1,500.00",Paycheck,Paycheck
-,,"$5,007.00",,Gifts,"-$4,507",,,,
-,,$350.00,,Utilities,+$50,,,,
-,,$3.00,,Transportation,-$3,,,,
+,Expenses,,,,,,Income,,,,,Savings,,,
+,,,,,,,,,,,,,,,
+,Date,Amount,Description,Category,Diff.,,Date,Amount,Description,Category,,Date,Amount,Description,Category
+,12/8/2000,$100.00,Rent,Utilities,+$50,,12/1/2000,"$1,500.00",Paycheck,Paycheck,,12/9/2000,"$5,000.00",sock away,savings a/c
+,12/10/2000,"$5,007.00",,Gifts,"-$4,507",,12/15/2000,"$2,500.00",Paycheck,Paycheck,
+,12/15/2000,$350.00,,Utilities,+$50,,,,
+,12/19/2000,$3.00,,Transportation,-$3,,,,
 ,,,,,#N/A,,,,
 ,,,,,#N/A,,,,
 ,,,,,#N/A,,,,
