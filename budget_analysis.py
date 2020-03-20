@@ -55,10 +55,13 @@ def read_tx_file(a_tx_file, a_skiprows=3, a_skipfooter=0, a_ord=True,
     income = income.dropna()
     income[a_cols[1]] = pd.to_numeric(
             income[a_cols[1]].replace(a_currency_symbols, '',regex=True))
-    return expenses, income
+    # rename columns to include unit
+    expenses = expenses.rename(columns={a_cols[1]: a_cols[1]+" [$]"})
+    income = income.rename(columns={a_cols[1]: a_cols[1]+" [$]"})
+    return income, expenses
 # enddef read_tx_file() #
 
-def categorize_tx(a_tx, a_cols=['Category', 'Amount']):
+def categorize_tx(a_tx, a_cols=['Category', 'Amount [$]']):
     """ Function to categorize transactions in income or expenses
     Parameters:
         a_tx (DataFrame): Dataframe containing transactions
@@ -74,7 +77,8 @@ def categorize_tx(a_tx, a_cols=['Category', 'Amount']):
     return grouped_tx
 # enddef categorize_tx() #
 
-def write_reports(a_report_file, a_period, a_grp_inc, a_grp_exp, a_summary_file):
+def write_reports(a_report_file, a_period, a_grp_inc, a_grp_exp, a_summary_file,
+        a_amt_colname='Amount [$]'):
     """ Function to create summary reports.
     Parameters:
         a_report_file (str): Filename of where to store reports for
@@ -83,12 +87,13 @@ def write_reports(a_report_file, a_period, a_grp_inc, a_grp_exp, a_summary_file)
         a_grp_exp (Dataframe): Dataframe containing grouped expense information
         a_summary_file (str): Filename where summaries of previous runs
             are stored
+        a_amt_colname (str): Column name containing raw amount values
     Returns:
         None
     """
     # compute total income and expenses
-    tot_inc = np.sum(a_grp_inc['Amount'])
-    tot_exp = np.sum(a_grp_exp['Amount'])
+    tot_inc = np.sum(a_grp_inc[a_amt_colname])
+    tot_exp = np.sum(a_grp_exp[a_amt_colname])
     # compute savings, savings-% and net worth
     savings = tot_inc - tot_exp
     # NOTE: We implicitly assume total income > 0, otherwise the computation of
@@ -108,9 +113,9 @@ def write_reports(a_report_file, a_period, a_grp_inc, a_grp_exp, a_summary_file)
         rf.write("Total expenses = $ {:.2f}\n".format(tot_exp))
         rf.write("Net savings = $ {:.2f}\n".format(savings))
         rf.write("Savings as a % of income = {:.2f}%\n".format(sav_pct))
-        rf.write("\nCategory-wise income [$]:\n")
+        rf.write("\nCategory-wise income:\n")
         rf.write(a_grp_inc.to_string())
-        rf.write("\n\nCategory-wise expenses [$]:\n")
+        rf.write("\n\nCategory-wise expenses:\n")
         rf.write(a_grp_exp.to_string())
     # endwith #
     if not os.path.exists(a_summary_file):
@@ -149,7 +154,8 @@ def plot_tallied_tx(a_grouped_tx, a_title, a_plotfile, a_col='Contribution [%]')
     plt.savefig(a_plotfile)
 # enddef plot_tallied_tx() #
 
-def main(a_tx_file, a_period="Test period", a_report_file="Test_report.txt",
+def main(a_tx_file, a_period="Test period",
+        a_report_file="TestPeriod_report.txt",
         a_summary_file="MyBudget_summary.csv",
         a_summary_plot="MyBudgetSummaryPlot.png"):
     """ Main function.
@@ -165,7 +171,7 @@ def main(a_tx_file, a_period="Test period", a_report_file="Test_report.txt",
         None
     """
     # read the transaction file
-    exp, inc = read_tx_file(a_tx_file)
+    inc, exp = read_tx_file(a_tx_file)
     # categorize expenses and income
     grp_inc = categorize_tx(inc)
     grp_exp = categorize_tx(exp)
