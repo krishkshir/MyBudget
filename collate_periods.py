@@ -41,7 +41,7 @@ def summarize_all_periods(a_initial_net_worth, a_summary_file,
         warnings.warn(warning_msg)
         net_sav_pct = -np.inf
     else:
-        net_sav_pct = 100.0 * total_savings / total_income
+        net_sav_pct = 100.0 * net_savings / total_income
     # endif #
     # net savings utilization ratio
     if net_savings < 0:
@@ -53,17 +53,14 @@ def summarize_all_periods(a_initial_net_worth, a_summary_file,
         sav_util = 100.0 * total_savings / net_savings
     # endif #
     with open(a_summary_file,'a') as sf:
-        sf.write("\nTotal,{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}\n".format(
+        sf.write("\n\nTotal,{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}\n".format(
             total_income, total_expenses, total_savings, extra_savings,
             net_sav_pct, sav_util))
     # endwith #
     # compute every month's net worth
-    net_worth = [a_initial_net_worth]
-    for sav in summary_df[a_sav_colname]:
-        net_worth +=  [net_worth[-1] + sav]
-    # endfor #
-    net_worth.pop(0)
-    summary_df["Net worth [$]"] = net_worth
+    summary_df["Net worth [$]"] = (a_initial_net_worth +
+            summary_df[a_inc_colname].cumsum() -
+            summary_df[a_exp_colname].cumsum())
     return summary_df
 # enddef summarize_all_periods() #
 
@@ -155,7 +152,8 @@ def write_summary_report(a_initial_net_worth, a_summary_df, a_report_file,
 
 def main(a_initial_net_worth, a_summary_file,
         a_inc_exp_plotfile="Plot_incexp_summary.png",
-        a_networth_savingspct_plotfile="Plot_networth_savingspct.png"):
+        a_networth_savingspct_plotfile="Plot_networth_savingspct.png",
+        a_summary_reportfile="Summary_report.txt"):
     """ Main function
     Parameters:
         a_initial_net_worth (float): Initial net worth at the beginning of all
@@ -177,7 +175,7 @@ def main(a_initial_net_worth, a_summary_file,
     plot_summary_diff_axes(summary_df, a_networth_savingspct_plotfile,
             "Time period", ("Net worth [$]", "pct-savings [%]"))
     write_summary_report(a_initial_net_worth, summary_df,
-    "Summary_report.txt", "Time period", "Net worth [$]")
+    a_summary_reportfile, "Time period", "Net worth [$]")
 # enddef main() #
 
 if __name__ == "__main__":
