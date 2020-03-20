@@ -31,19 +31,31 @@ def summarize_all_periods(a_initial_net_worth, a_summary_file,
     # compute total income, expenses and savings for all periods
     total_income = summary_df[a_inc_colname].sum()
     total_expenses = summary_df[a_exp_colname].sum()
-    total_savings = total_income - total_expenses
+    total_savings = summary_df[a_sav_colname].sum()
+    net_savings = total_income - total_expenses
+    extra_savings = net_savings - total_savings
     # if total income < 0, %-savings is undefined
     if total_income < 0:
         warning_msg = "Total income is negative (-${:.2f})!"
-        warning_msg = warning_msg.format(a_period, -total_income)
+        warning_msg = warning_msg.format(-total_income)
         warnings.warn(warning_msg)
         net_sav_pct = -np.inf
     else:
         net_sav_pct = 100.0 * total_savings / total_income
     # endif #
+    # net savings utilization ratio
+    if net_savings < 0:
+        warning_msg = "Net savings is negative (-${:.2f})!"
+        warning_msg = warning_msg.format(-net_savings)
+        warnings.warn(warning_msg)
+        sav_util = -np.inf
+    else:
+        sav_util = 100.0 * total_savings / net_savings
+    # endif #
     with open(a_summary_file,'a') as sf:
-        sf.write("\nTotal,{:.2f},{:.2f},{:.2f},{:.2f}\n".format(
-            total_income, total_expenses, total_savings, net_sav_pct))
+        sf.write("\nTotal,{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}\n".format(
+            total_income, total_expenses, total_savings, extra_savings,
+            net_sav_pct, sav_util))
     # endwith #
     # compute every month's net worth
     net_worth = [a_initial_net_worth]
@@ -76,6 +88,7 @@ def plot_summary_same_axes(a_summary_df, a_summary_plot, a_period_colname,
     ax.legend(a_plot_cols)
     ax.minorticks_on()
     ax.grid(b=True, which='both', axis='both')
+    plt.xticks(rotation=90)
     plt.tight_layout()
     plt.savefig(a_summary_plot)
 # enddef plot_summary_same_axes() #
@@ -111,6 +124,7 @@ def plot_summary_diff_axes(a_summary_df, a_summary_plot, a_period_colname,
     ax2.minorticks_on()
     ax2.grid(b=True, which='both', axis='both', color='b', linestyle='--',
             linewidth=0.3)
+    plt.xticks(rotation=90)
     plt.tight_layout()
     plt.savefig(a_summary_plot)
 # enddef plot_summary_diff_axes() #
