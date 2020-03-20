@@ -115,6 +115,30 @@ def plot_summary_diff_axes(a_summary_df, a_summary_plot, a_period_colname,
     plt.savefig(a_summary_plot)
 # enddef plot_summary_diff_axes() #
 
+def write_summary_report(a_initial_net_worth, a_summary_df, a_report_file,
+        a_period_colname, a_networth_colname):
+    """ Write report of total net worth with time.
+    Parameters:
+        a_initial_net_worth (float): Initial net worth at the beginning of all
+            periods
+        a_summary_df (DataFrame): DataFrame containing summary file + net worth
+        a_report_file (str): Filename of report file to write
+        a_period_colname (str): Column name containing name of period
+        a_networth_colname (str): Column name containing net worth
+    Returns:
+        None
+    """
+    df = pd.DataFrame(data={a_period_colname:["Start"], a_networth_colname:
+        [a_initial_net_worth]})
+    df = df.append(a_summary_df[[a_period_colname, a_networth_colname]])
+    pct_change = 100.0 * (df[a_networth_colname].iloc[-1] /
+            df[a_networth_colname].iloc[0] - 1.0)
+    with open(a_report_file,'w') as rf:
+        rf.write(df.to_string(index=False))
+        rf.write("\n\n%-change in net worth: {:.2f}%".format(pct_change))
+    # endwith #
+# enddef write_summary_report() #
+
 def main(a_initial_net_worth, a_summary_file,
         a_inc_exp_plotfile="Plot_incexp_summary.png",
         a_networth_savingspct_plotfile="Plot_networth_savingspct.png"):
@@ -138,6 +162,8 @@ def main(a_initial_net_worth, a_summary_file,
             ["Income [$]", "Expenses [$]"])
     plot_summary_diff_axes(summary_df, a_networth_savingspct_plotfile,
             "Time period", ("Net worth [$]", "pct-savings [%]"))
+    write_summary_report(a_initial_net_worth, summary_df,
+    "Summary_report.txt", "Time period", "Net worth [$]")
 # enddef main() #
 
 if __name__ == "__main__":
