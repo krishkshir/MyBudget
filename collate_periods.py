@@ -17,7 +17,7 @@ def summarize_all_periods(a_initial_net_worth, a_summary_file,
     """ Summarize YTD results from monthly summary file
     Parameters:
         a_initial_net_worth (float): Net worth at beginning of year
-        a_summary_file (DataFrame): Filename containing period summary for
+        a_summary_file (str): Filename containing period summary for
             different periods
         a_inc_colname (str): Column name of income column
         a_exp_colname (str): Column name of expenses column
