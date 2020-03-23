@@ -143,7 +143,7 @@ def write_reports(a_report_file, a_period, a_grp_inc, a_grp_exp, a_grp_sav,
     if not os.path.exists(a_summary_file):
         with  open(a_summary_file,'w') as sf:
             sf.write("Time period,Income [$],Expenses [$],"+
-                    "Utilized Savings [$],"+
+                    "Utilized savings [$],"+
                     "Unutilzed savings [$],pct-savings [%]," +
                     "Savings utilization ratio [%]\n")
         # endwith #

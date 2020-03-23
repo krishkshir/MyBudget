@@ -13,7 +13,7 @@ from matplotlib import pyplot as plt
 
 def summarize_all_periods(a_initial_net_worth, a_summary_file,
         a_inc_colname="Income [$]", a_exp_colname="Expenses [$]",
-        a_sav_colname="Utilized Savings [$]"):
+        a_sav_colname="Utilized savings [$]"):
     """ Summarize YTD results from monthly summary file
     Parameters:
         a_initial_net_worth (float): Net worth at beginning of year
