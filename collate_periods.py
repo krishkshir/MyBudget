@@ -53,7 +53,7 @@ def summarize_all_periods(a_initial_net_worth, a_summary_file,
         sav_util = 100.0 * total_savings / net_savings
     # endif #
     with open(a_summary_file,'a') as sf:
-        sf.write("\n\nTotal,{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}\n".format(
+        sf.write("\nTotal,{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}\n".format(
             total_income, total_expenses, total_savings, extra_savings,
             net_sav_pct, sav_util))
     # endwith #
