@@ -142,15 +142,11 @@ def write_reports(a_report_file, a_period, a_grp_inc, a_grp_exp, a_grp_sav,
         rf.write("\n\nCategory-wise savings:\n")
         rf.write(a_grp_sav.to_string())
     # endwith #
-    if not os.path.exists(a_summary_file):
-        with  open(a_summary_file,'w') as sf:
-            sf.write("Time period,Income [$],Expenses [$],"+
+    with  open(a_summary_file,'w') as sf:
+        sf.write("Time period,Income [$],Expenses [$],"+
                     "Utilized savings [$],"+
                     "Unutilzed savings [$],pct-savings [%]," +
                     "Savings utilization ratio [%]\n")
-        # endwith #
-    # endif #
-    with open(a_summary_file,'a') as sf:
         sf.write("{},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}\n".format(
             a_period, tot_inc, tot_exp, tot_sav, xtra_sav, sav_pct, sav_util))
     # endwith #
