@@ -117,7 +117,7 @@ def plot_summary_diff_axes(a_summary_df, a_summary_plot, a_period_colname,
     ax2.plot(a_summary_df[a_period_colname], a_summary_df[a_plot_cols[1]],
             color='b')
     ax2.set_ylabel('%')
-    ax2.legend([a_plot_cols[1]], loc='upper right')
+    ax2.legend([a_plot_cols[1]], loc='lower right')
     ax2.minorticks_on()
     ax2.grid(b=True, which='both', axis='both', color='b', linestyle='--',
             linewidth=0.3)
